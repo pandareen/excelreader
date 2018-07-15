@@ -22,10 +22,23 @@ public class Main {
 
         for (int iindex = 0; iindex < workbook.getNumberOfSheets(); iindex++) {
             Sheet sheet = workbook.getSheetAt(iindex);
-            for (int jindex = 1; jindex < sheet.getLastRowNum(); jindex++) {
+
+            oracle_script_file.append("\n\n-- Configuration elements for " + sheet.getSheetName() + "\n");
+            mssql_script_file.append("\n\n-- Configuration elements for " + sheet.getSheetName() + "\n");
+
+            for (int jindex = 1; jindex < sheet.getPhysicalNumberOfRows(); jindex++) {
                 Row row = sheet.getRow(jindex);
-                String script_key = row.getCell(0).toString();
+
+                if (row == null) {
+                    continue;
+                }
+
+                String script_key = row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).toString();
                 String script_value = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).toString();
+
+                if ("".equalsIgnoreCase(script_key.trim())) {
+                    continue;
+                }
 
                 oracle_script_file.append("INSERT INTO SECLORECONFIG VALUES('" + script_key + "','" + script_value + "');\n");
                 mssql_script_file.append("INSERT INTO SECLORECONFIG VALUES(N'" + script_key + "',N'" + script_value + "');\n");
