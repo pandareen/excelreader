@@ -4,7 +4,6 @@ $Office365AdminPassword = 'Seclore@123'
 $SharedMailboxList = "./output/sharedmailboxlist.json"
 $SharedMailboxListFullAccessRights = "./output/sharedmailboxpermissionlist.json"
 $SharedMailboxListSendAsRights = "./output/sharedmailboxsendasrightslist.json"
-$SharedMailboxListGrantOnBehalfOf = "./output/sharedmailboxgrantonbehalfoflist.json"
 
 #Main
 Function Main
@@ -39,19 +38,22 @@ Function Main
 
     $shared_mailboxes = Get-Mailbox | where {$_.recipientTypeDetails -eq 'sharedmailbox' }
 
-    $shared_mailboxes | ConvertTo-Json > $SharedMailboxList
+    $shared_mailboxes | Select Identity, ExchangeGuid, UserPrincipalName, Guid, GrantSendOnBehalfTo | ConvertTo-Json > $SharedMailboxList
 
-    $shared_mailboxes_permission = $shared_mailboxes | Get-MailboxPermission | where {$_.user.tostring() -ne "NT AUTHORITY\SELF" -and $_.IsInherited -eq $false}
+    $shared_mailboxes_permission =  Foreach ($smb in $shared_mailboxes) {
+        $full_access_permissions = Get-MailboxPermission -Identity $smb.Guid.toString() | ? {$_.user.tostring() -ne "NT AUTHORITY\SELF" -and $_.IsInherited -eq $false -and $_.AccessRights -eq 'FullAccess'}
+        $permission_result = $full_access_permissions  | Select *, @{Name="smb_guid";Expression={$smb.guid.toString()}}
+        $permission_result
+    }
 
     $shared_mailboxes_permission | ConvertTo-Json > $SharedMailboxListFullAccessRights
 
-    $recipient_permission = Get-Mailbox -ResultSize Unlimited | Get-RecipientPermission | ? {$_.Trustee -ne "NT AUTHORITY\SELF"}
-
+    $recipient_permission =   Foreach ($smb in $shared_mailboxes) {
+        $recipient_permission_list = Get-RecipientPermission -Identity $smb.Guid.toString() | ? {$_.Trustee -ne "NT AUTHORITY\SELF"}
+        $recipient_permission_result = $recipient_permission_list | Select *, @{Name="smb_guid";Expression={$smb.guid.toString()}}
+        $recipient_permission_result
+    }
     $recipient_permission | ConvertTo-Json > $SharedMailboxListSendAsRights
-
-    $granted_on_behalf = $shared_mailboxes |  ? {$_.GrantSendOnBehalfTo -ne $null} | select Name,Alias,UserPrincipalName,PrimarySmtpAddress,GrantSendOnBehalfTo
-
-    $granted_on_behalf | ConvertTo-Json > $SharedMailboxListGrantOnBehalfOf
 
     exit
 }
