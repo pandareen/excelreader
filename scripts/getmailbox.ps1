@@ -49,7 +49,7 @@ Function Main
     $shared_mailboxes_permission | ConvertTo-Json > $SharedMailboxListFullAccessRights
 
     $recipient_permission =   Foreach ($smb in $shared_mailboxes) {
-        $recipient_permission_list = Get-RecipientPermission -Identity $smb.ExternalDirectoryObjectId | ? { $_.Trustee -ne "NT AUTHORITY\SELF" }
+        $recipient_permission_list = Get-RecipientPermission -Identity $smb.ExternalDirectoryObjectId | ? { $_.Trustee -ne "NT AUTHORITY\SELF" -and $_.AccessRights -eq 'SendAs' }
         $recipient_permission_result = $recipient_permission_list | Select AccessRights, Trustee, @{ Name = "extDirObjId"; Expression = { $smb.ExternalDirectoryObjectId } }
         $recipient_permission_result
     }
