@@ -38,19 +38,19 @@ Function Main
 
     $shared_mailboxes = Get-Mailbox | where {$_.recipientTypeDetails -eq 'sharedmailbox' }
 
-    $shared_mailboxes | Select Identity, ExchangeGuid, UserPrincipalName, Guid, GrantSendOnBehalfTo | ConvertTo-Json > $SharedMailboxList
+    $shared_mailboxes | Select ExchangeGuid, UserPrincipalName, GrantSendOnBehalfTo | ConvertTo-Json > $SharedMailboxList
 
     $shared_mailboxes_permission =  Foreach ($smb in $shared_mailboxes) {
-        $full_access_permissions = Get-MailboxPermission -Identity $smb.Guid.toString() | ? {$_.user.tostring() -ne "NT AUTHORITY\SELF" -and $_.IsInherited -eq $false -and $_.AccessRights -eq 'FullAccess'}
-        $permission_result = $full_access_permissions  | Select *, @{Name="smb_guid";Expression={$smb.guid.toString()}}
+        $full_access_permissions = Get-MailboxPermission -Identity $smb.ExternalDirectoryObjectId | ? { $_.user.tostring() -ne "NT AUTHORITY\SELF" -and $_.IsInherited -eq $false -and $_.AccessRights -eq 'FullAccess' }
+        $permission_result = $full_access_permissions  | Select AccessRights, User, Trustee, @{ Name = "extDirObjId"; Expression = { $smb.ExternalDirectoryObjectId } }
         $permission_result
     }
 
     $shared_mailboxes_permission | ConvertTo-Json > $SharedMailboxListFullAccessRights
 
     $recipient_permission =   Foreach ($smb in $shared_mailboxes) {
-        $recipient_permission_list = Get-RecipientPermission -Identity $smb.Guid.toString() | ? {$_.Trustee -ne "NT AUTHORITY\SELF"}
-        $recipient_permission_result = $recipient_permission_list | Select *, @{Name="smb_guid";Expression={$smb.guid.toString()}}
+        $recipient_permission_list = Get-RecipientPermission -Identity $smb.ExternalDirectoryObjectId | ? { $_.Trustee -ne "NT AUTHORITY\SELF" }
+        $recipient_permission_result = $recipient_permission_list | Select *, @{ Name = "extDirObjId"; Expression = { $smb.ExternalDirectoryObjectId } }
         $recipient_permission_result
     }
     $recipient_permission | ConvertTo-Json > $SharedMailboxListSendAsRights
