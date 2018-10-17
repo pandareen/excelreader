@@ -38,11 +38,11 @@ Function Main
 
     $shared_mailboxes = Get-Mailbox | where {$_.recipientTypeDetails -eq 'sharedmailbox' }
 
-    $shared_mailboxes | Select ExchangeGuid, UserPrincipalName, GrantSendOnBehalfTo | ConvertTo-Json > $SharedMailboxList
+    $shared_mailboxes | Select ExternalDirectoryObjectId, UserPrincipalName, GrantSendOnBehalfTo | ConvertTo-Json > $SharedMailboxList
 
     $shared_mailboxes_permission =  Foreach ($smb in $shared_mailboxes) {
         $full_access_permissions = Get-MailboxPermission -Identity $smb.ExternalDirectoryObjectId | ? { $_.user.tostring() -ne "NT AUTHORITY\SELF" -and $_.IsInherited -eq $false -and $_.AccessRights -eq 'FullAccess' }
-        $permission_result = $full_access_permissions  | Select AccessRights, User, Trustee, @{ Name = "extDirObjId"; Expression = { $smb.ExternalDirectoryObjectId } }
+        $permission_result = $full_access_permissions  | Select AccessRights, User, @{ Name = "extDirObjId"; Expression = { $smb.ExternalDirectoryObjectId } }
         $permission_result
     }
 
@@ -50,7 +50,7 @@ Function Main
 
     $recipient_permission =   Foreach ($smb in $shared_mailboxes) {
         $recipient_permission_list = Get-RecipientPermission -Identity $smb.ExternalDirectoryObjectId | ? { $_.Trustee -ne "NT AUTHORITY\SELF" }
-        $recipient_permission_result = $recipient_permission_list | Select *, @{ Name = "extDirObjId"; Expression = { $smb.ExternalDirectoryObjectId } }
+        $recipient_permission_result = $recipient_permission_list | Select AccessRights, Trustee, @{ Name = "extDirObjId"; Expression = { $smb.ExternalDirectoryObjectId } }
         $recipient_permission_result
     }
     $recipient_permission | ConvertTo-Json > $SharedMailboxListSendAsRights
