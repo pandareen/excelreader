@@ -8,21 +8,27 @@ public class PwrShellDemo {
 
     public static void main(String args[]) {
 
-        try {
-            String command = "powershell.exe \"scripts/getmailbox.ps1";
-            ExecuteWatchdog watchdog = new ExecuteWatchdog(20000);
+        try
+        {
+            String command = "powershell.exe \"scripts/getmailbox.ps1\"";
+            ExecuteWatchdog watchdog = new ExecuteWatchdog(200000);
             Process powerShellProcess = Runtime.getRuntime().exec(command);
-            if (watchdog != null) {
+
+            if (watchdog != null)
+            {
                 watchdog.start(powerShellProcess);
             }
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(powerShellProcess.getErrorStream()));
             String line;
             System.out.println("Output :");
-            while ((line = stdInput.readLine()) != null) {
+            while ((line = stdInput.readLine()) != null)
+            {
                 System.out.println(line);
             }
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }

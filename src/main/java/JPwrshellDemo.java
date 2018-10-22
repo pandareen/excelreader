@@ -7,8 +7,12 @@ public class JPwrshellDemo {
     {
         PowerShell powerShell = PowerShell.openSession();
 
-        PowerShellResponse response = powerShell.executeCommand("scripts/getmailbox.ps1");
-
+        PowerShellResponse response = powerShell.executeScript("scripts/part1.ps1");
         System.out.println("Results:" + response.getCommandOutput());
+
+
+        response = powerShell.executeScript("scripts/part2.ps1");
+        System.out.println("Results:" + response.getCommandOutput());
+        powerShell.close();
     }
 }
