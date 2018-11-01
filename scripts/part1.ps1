@@ -8,6 +8,7 @@ $SharedMailboxListSendAsRights = "./output/sharedmailboxsendasrightslist.json"
 #Main
 Function Main
 {
+    Write-Host : $blah
     #Remove all existing Powershell sessions
     Get-PSSession | Remove-PSSession
 

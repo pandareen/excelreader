@@ -11,7 +11,7 @@ public class PwrShellDemo {
         try
         {
             String command = "powershell.exe \"scripts/getmailbox.ps1\"";
-            ExecuteWatchdog watchdog = new ExecuteWatchdog(200000);
+            ExecuteWatchdog watchdog = new ExecuteWatchdog(99999999999L);
             Process powerShellProcess = Runtime.getRuntime().exec(command);
 
             if (watchdog != null)
