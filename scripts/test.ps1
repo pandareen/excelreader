@@ -1,2 +1,2 @@
 Param([string]$blah)
-$blah > "C:\Users\Admin\out.txt"
+$blah > "C:\Users\sandesh\out.txt"
