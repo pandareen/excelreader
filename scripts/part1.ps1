@@ -1,6 +1,6 @@
 #Constant Variables
 $Office365AdminUsername = 'admin@stringbase.in'
-$Office365AdminPassword = 'Seclore@123'
+$Office365AdminPassword = 'Seclore@1234'
 $SharedMailboxList = "./output/sharedmailboxlist.json"
 $SharedMailboxListFullAccessRights = "./output/sharedmailboxpermissionlist.json"
 $SharedMailboxListSendAsRights = "./output/sharedmailboxsendasrightslist.json"

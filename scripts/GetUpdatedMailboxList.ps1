@@ -79,8 +79,8 @@ function Get-AliasList([string[]]$Aliases, [string]$ExcludeDomain, [System.Colle
 }
 
 
-#$shared_mailboxes = Get-Mailbox | where { $_.recipientTypeDetails -eq 'sharedmailbox' }
-$shared_mailboxes = Get-Mailbox -Identity "testing"
+$shared_mailboxes = Get-Mailbox | where { $_.recipientTypeDetails -eq 'sharedmailbox' -and $_.WhenChangedUTC -gt $Lower -and $_.WhenChangedUTC -lt $Upper }
+#$shared_mailboxes = Get-Mailbox -Identity "testing"
 
 
 $FinalList = New-Object System.Collections.ArrayList

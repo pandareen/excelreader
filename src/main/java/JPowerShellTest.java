@@ -9,10 +9,10 @@ public class JPowerShellTest {
     {
         PowerShell powerShell = PowerShell.openSession();
         Map<String, String> myConfig = new HashMap<String, String>();
-        myConfig.put("maxWait", "300000");
+        myConfig.put("maxWait", "10000");
         powerShell.configuration(myConfig);
-        PowerShellResponse response = powerShell.executeScript("scripts/test.ps1", "$blah='asdasd'");
-        System.out.println("Results:" + response.getCommandOutput());
+        PowerShellResponse response = powerShell.executeScript("scripts/test.ps1", "-blah 'asdasd'");
+        System.out.println(response.isTimeout());
         powerShell.close();
     }
 }
